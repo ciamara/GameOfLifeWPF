@@ -1,0 +1,23 @@
+## Visual Studio i pliki środowiska
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Katalogi kompilacji (.NET / C#)
+bin/
+obj/
+
+## Pliki kompilacji i cache
+[Bb]in/
+[Oo]bj/
+*.wpftmp*
+
+## Pakiety NuGet
+*.nupkg
+packages/
+
+## Logi i raporty
+*.log
+*.tlog
