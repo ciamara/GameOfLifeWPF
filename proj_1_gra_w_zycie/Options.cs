@@ -6,10 +6,10 @@ namespace proj_1_gra_w_zycie
 {
     public class Options : INotifyPropertyChanged
     {
-        private string _rText = "123";
-        private string _wText = "123456";
+        private string _rText = "3";
+        private string _wText = "234";
         private string _bText = "23";
-        private string _pText = "01";
+        private string _pText = "012";
         private string _zText = "0123";
         private int _m = 1;
         private int _l = 20;
@@ -132,7 +132,7 @@ namespace proj_1_gra_w_zycie
             return input.Where(char.IsDigit).Select(c => c - '0').ToHashSet();
         }
 
-        public Options(string r = "123", string w = "123456", string b = "23", string p = "01", string z = "0123", int m = 1, int l = 20)
+        public Options(string r = "3", string w = "234", string b = "23", string p = "012", string z = "0123", int m = 1, int l = 20)
         {
             _rText = r;
             _wText = w;

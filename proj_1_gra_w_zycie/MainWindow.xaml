@@ -22,15 +22,21 @@
                 BorderBrush="#2D2D30" 
                 BorderThickness="1" 
                 CornerRadius="4">
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+            <ScrollViewer x:Name="BoardScrollViewer"
+                          HorizontalScrollBarVisibility="Auto" 
                           VerticalScrollBarVisibility="Auto"
                           HorizontalContentAlignment="Center"
-                          VerticalContentAlignment="Center">
+                          VerticalContentAlignment="Center"
+                          PreviewMouseWheel="BoardScrollViewer_PreviewMouseWheel">
 
                 <ItemsControl x:Name="BoardControl" 
                               ItemsSource="{Binding Board.Cells}"
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center">
+
+                    <ItemsControl.LayoutTransform>
+                        <ScaleTransform x:Name="BoardScaleTransform" ScaleX="1.0" ScaleY="1.0"/>
+                    </ItemsControl.LayoutTransform>
 
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -46,7 +52,10 @@
                                     Height="8" 
                                     Background="#222222"
                                     BorderBrush="#2D2D30"
-                                    BorderThickness="0.5">
+                                    BorderThickness="0.5"
+                                    Cursor="Hand"
+                                    MouseLeftButtonDown="Cell_MouseLeftButtonDown"
+                                    MouseRightButtonDown="Cell_MouseRightButtonDown">
 
                                 <Ellipse x:Name="AnimalMarker" 
                                          Width="5" 
@@ -93,7 +102,7 @@
                                FontWeight="Bold" 
                                Margin="5,10,0,10"/>
                     <TextBox x:Name="RText"
-                             Text="123"
+                             Text="{Binding CurrentOptions.RText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Width="55"
                              Height="25"
                              Margin="16,0,0,0"
@@ -104,7 +113,7 @@
                                FontWeight="Bold" 
                                Margin="40,10,0,10"/>
                     <TextBox x:Name="WText"
-                             Text="123456"
+                             Text="{Binding CurrentOptions.WText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Width="55"
                              Height="25"
                              Margin="16,0,0,0"
@@ -118,7 +127,7 @@
                                FontWeight="Bold" 
                                Margin="5,10,0,10"/>
                     <TextBox x:Name="BText"
-                             Text="23"
+                             Text="{Binding CurrentOptions.BText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Width="55"
                              Height="25"
                              Margin="16,0,0,0"
@@ -129,7 +138,7 @@
                                FontWeight="Bold" 
                                Margin="46,10,0,10"/>
                     <TextBox x:Name="PText"
-                             Text="01"
+                             Text="{Binding CurrentOptions.PText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Width="55"
                              Height="25"
                              Margin="16,0,0,0"
@@ -142,7 +151,7 @@
                                FontWeight="Bold" 
                                Margin="70,10,0,10"/>
                     <TextBox x:Name="ZText"
-                             Text="0123"
+                             Text="{Binding CurrentOptions.ZText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              Width="55"
                              Height="25"
                              Margin="16,0,0,0"
@@ -157,7 +166,7 @@
                     <Slider x:Name="MSlider"
                             Minimum="1"
                             Maximum="10"
-                            Value="1"
+                            Value="{Binding CurrentOptions.M, Mode=TwoWay}"
                             TickFrequency="1"
                             IsSnapToTickEnabled="True"
                             TickPlacement="BottomRight" 
@@ -179,7 +188,7 @@
                     <Slider x:Name="LSlider"
                             Minimum="1"
                             Maximum="50"
-                            Value="20"
+                            Value="{Binding CurrentOptions.L, Mode=TwoWay}"
                             TickFrequency="1"
                             IsSnapToTickEnabled="True"
                             TickPlacement="BottomRight" 
@@ -197,8 +206,8 @@
                            FontSize="16" 
                            FontWeight="Bold" 
                            Margin="0,10,0,14"/>
-                <StackPanel Orientation="Horizontal"
-                            Height="35">
+
+                <StackPanel Orientation="Horizontal" Height="35">
                     <Button x:Name="PopulateButton"
                             Content="Populate"
                             Click="PopulateButton_Click"
@@ -210,9 +219,8 @@
                             Width="70"
                             Margin="40,0,0,0"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal"
-                            Height="35"
-                            Margin="0,15,0,0">
+
+                <StackPanel Orientation="Horizontal" Height="35" Margin="0,15,0,0">
                     <Button x:Name="StepButton"
                             Content="Step"
                             Click="StepButton_Click"
@@ -241,6 +249,20 @@
                            FontSize="16" 
                            FontWeight="Bold" 
                            Margin="0,10,0,5"/>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Year: " 
+                               Foreground="#AAAAAA" 
+                               FontSize="12" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,5"/>
+                    <TextBlock Text="{Binding CurrentYear}" 
+                               Foreground="#AAAAAA" 
+                               FontSize="12" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,5"/>
+                </StackPanel>
+
                 <Grid Width="230" Margin="0,4,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -255,30 +277,31 @@
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="plants:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding CurrentStatistics.TotalPlants}" Foreground="#4CAF50" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Stats.TotalPlants}" Foreground="#4CAF50" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
 
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="animals:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding CurrentStatistics.TotalAnimals}" Foreground="#EF5350" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Stats.TotalAnimals}" Foreground="#EF5350" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="grown:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentStatistics.PlantsGrown}" Foreground="#81C784" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Stats.PlantsGrown}" Foreground="#81C784" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
 
                     <TextBlock Grid.Row="1" Grid.Column="2" Text="born:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding CurrentStatistics.AnimalsBorn}" Foreground="#E57373" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding Stats.AnimalsBorn}" Foreground="#E57373" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="wilted:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding CurrentStatistics.PlantsWilted}" Foreground="#DCE775" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Stats.PlantsWilted}" Foreground="#DCE775" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
 
                     <TextBlock Grid.Row="2" Grid.Column="2" Text="died:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding CurrentStatistics.AnimalsDied}" Foreground="#B0BEC5" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding Stats.AnimalsDied}" Foreground="#B0BEC5" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
                 </Grid>
                 <TextBlock Text="Save/Load" 
                            Foreground="#FFFFFF" 
                            FontSize="16" 
                            FontWeight="Bold" 
                            Margin="0,10,0,5"/>
-                <StackPanel Orientation="Horizontal"
-                            Height="35"
+
+                <StackPanel Orientation="Horizontal" 
+                            Height="35" 
                             Margin="0,10,0,0">
                     <Button x:Name="SaveButton"
                             Content="Save"
