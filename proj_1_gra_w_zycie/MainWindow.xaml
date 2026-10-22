@@ -165,7 +165,7 @@
                                Margin="5,10,0,10"/>
                     <Slider x:Name="MSlider"
                             Minimum="1"
-                            Maximum="10"
+                            Maximum="5"
                             Value="{Binding CurrentOptions.M, Mode=TwoWay}"
                             TickFrequency="1"
                             IsSnapToTickEnabled="True"
