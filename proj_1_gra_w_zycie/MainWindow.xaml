@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:proj_1_gra_w_zycie"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Game of Life" 
         Height="700" 
@@ -50,31 +51,42 @@
                             <Border x:Name="CellBorder"
                                     Width="8" 
                                     Height="8" 
-                                    Background="#222222"
-                                    BorderBrush="#2D2D30"
-                                    BorderThickness="0.5"
+                                    BorderBrush="#2D2D30" 
+                                    BorderThickness="0.5" 
                                     Cursor="Hand"
                                     MouseLeftButtonDown="Cell_MouseLeftButtonDown"
                                     MouseRightButtonDown="Cell_MouseRightButtonDown">
 
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="#222222"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasPlant}" Value="True">
+                                                <Setter Property="Background" 
+                                                        Value="{Binding DataContext.PlantBrush, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+
                                 <Ellipse x:Name="AnimalMarker" 
                                          Width="5" 
                                          Height="5" 
-                                         Fill="#E53935" 
-                                         HorizontalAlignment="Center"
-                                         VerticalAlignment="Center"
-                                         Visibility="Collapsed"/>
+                                         Fill="{Binding DataContext.AnimalBrush, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
+                                         HorizontalAlignment="Center" 
+                                         VerticalAlignment="Center">
+                                    <Ellipse.Style>
+                                        <Style TargetType="Ellipse">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasAnimal}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Ellipse.Style>
+                                </Ellipse>
                             </Border>
-
-                            <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding HasPlant}" Value="True">
-                                    <Setter TargetName="CellBorder" Property="Background" Value="#2E7D32"/>
-                                </DataTrigger>
-
-                                <DataTrigger Binding="{Binding HasAnimal}" Value="True">
-                                    <Setter TargetName="AnimalMarker" Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
 
@@ -313,6 +325,20 @@
                             Click="LoadButton_Click"
                             Width="70"
                             Margin="40,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <TextBlock Text="Plant color:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#FFFFFF"/>
+                    <xctk:ColorPicker SelectedColor="{Binding PlantColor, Mode=TwoWay}"
+                                      Width="120"
+                                      ShowDropDownButton="True"
+                                      UsingAlphaChannel="False"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                    <TextBlock Text="Animal color:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#FFFFFF"/>
+                    <xctk:ColorPicker SelectedColor="{Binding AnimalColor, Mode=TwoWay}"
+                                      Width="120"
+                                      ShowDropDownButton="True"
+                                      UsingAlphaChannel="False"/>
                 </StackPanel>
             </StackPanel>
         </Border>

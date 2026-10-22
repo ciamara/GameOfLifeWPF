@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +12,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using System;
 
 namespace proj_1_gra_w_zycie
 {
@@ -31,10 +32,43 @@ namespace proj_1_gra_w_zycie
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void NotifyPropertyChanged(string propertyName)
+        protected void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private Color? _plantColor = Colors.ForestGreen;
+        public Color? PlantColor
+        {
+            get => _plantColor;
+            set
+            {
+                if (_plantColor != value)
+                {
+                    _plantColor = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged(nameof(PlantBrush));
+                }
+            }
+        }
+
+        private Color? _animalColor = Colors.DeepPink;
+        public Color? AnimalColor
+        {
+            get => _animalColor;
+            set
+            {
+                if (_animalColor != value)
+                {
+                    _animalColor = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged(nameof(AnimalBrush));
+                }
+            }
+        }
+
+        public SolidColorBrush PlantBrush => new SolidColorBrush(PlantColor ?? Colors.ForestGreen);
+        public SolidColorBrush AnimalBrush => new SolidColorBrush(AnimalColor ?? Colors.DeepPink);
 
         public int CurrentYear
         {

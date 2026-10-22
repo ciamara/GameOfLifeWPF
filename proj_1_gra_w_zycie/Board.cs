@@ -291,8 +291,8 @@ namespace proj_1_gra_w_zycie
 
             if (stats != null)
             {
-                stats.AnimalsBorn = born;
-                stats.AnimalsDied = died;
+                stats.AnimalsBorn += born;
+                stats.AnimalsDied += died;
             }
         }
 
