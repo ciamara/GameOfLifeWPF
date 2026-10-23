@@ -83,5 +83,19 @@ namespace proj_1_gra_w_zycie
             this.HasAnimal = hasAnimal;
             this.AnimalAge = animalAge;
         }
+
+        public override string ToString()
+        {
+
+            string stringField = "";
+
+            stringField += HasPlant.ToString();
+            stringField += ",";
+            stringField += HasAnimal.ToString();
+            stringField += ",";
+            stringField += AnimalAge.ToString();
+
+            return stringField;
+        }
     }
 }

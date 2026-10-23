@@ -117,5 +117,30 @@ namespace proj_1_gra_w_zycie
             AnimalsDied = 0;
             AnimalsBorn = 0;
         }
+
+        public override string ToString()
+        {
+            string stringStats = "";
+
+            stringStats += "P";
+            stringStats += TotalPlants.ToString();
+
+            stringStats += "G";
+            stringStats += PlantsGrown.ToString();
+
+            stringStats += "W";
+            stringStats += PlantsWilted.ToString();
+
+            stringStats += "A";
+            stringStats += TotalAnimals.ToString();
+
+            stringStats += "B";
+            stringStats += AnimalsBorn.ToString();
+
+            stringStats += "D";
+            stringStats += AnimalsDied.ToString();
+
+            return stringStats;
+        }
     }
 }

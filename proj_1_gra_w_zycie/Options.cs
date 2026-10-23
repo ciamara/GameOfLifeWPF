@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 
 namespace proj_1_gra_w_zycie
@@ -141,6 +142,34 @@ namespace proj_1_gra_w_zycie
             _zText = z;
             _m = m;
             _l = l;
+        }
+
+        public override string ToString()
+        {
+            string stringOptions = "";
+
+            stringOptions += "R";
+            stringOptions += RText;
+
+            stringOptions += "W";
+            stringOptions += WText;
+
+            stringOptions += "B";
+            stringOptions += BText;
+
+            stringOptions += "P";
+            stringOptions += PText;
+
+            stringOptions += "Z";
+            stringOptions += ZText;
+
+            stringOptions += "M";
+            stringOptions += M.ToString();
+
+            stringOptions += "L";
+            stringOptions += L.ToString();
+
+            return stringOptions;
         }
     }
 }
