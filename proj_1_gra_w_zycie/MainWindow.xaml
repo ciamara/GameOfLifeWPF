@@ -11,13 +11,116 @@
         Width="1050"
         Background="#181818">
 
+    <Window.Resources>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Vertical">
+                    <Setter Property="Width" Value="8"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ScrollBar">
+                                <Border Background="Transparent">
+                                    <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                        <Track.Thumb>
+                                            <Thumb>
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border Background="#555555" CornerRadius="4" Margin="2,0,2,0"/>
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                        </Track.Thumb>
+                                    </Track>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Height" Value="8"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ScrollBar">
+                                <Border Background="Transparent">
+                                    <Track x:Name="PART_Track" IsDirectionReversed="False">
+                                        <Track.Thumb>
+                                            <Thumb>
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="Thumb">
+                                                        <Border Background="#555555" CornerRadius="4" Margin="0,2,0,2"/>
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                        </Track.Thumb>
+                                    </Track>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="AnimatedButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#3E3E42"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="ButtonScale" ScaleX="1" ScaleY="1"/>
+                            </Border.RenderTransform>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ButtonScale"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         To="1.05" Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="ButtonScale"
+                                                         Storyboard.TargetProperty="ScaleY"
+                                                         To="1.05" Duration="0:0:0.1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ButtonScale"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         To="1" Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="ButtonScale"
+                                                         Storyboard.TargetProperty="ScaleY"
+                                                         To="1" Duration="0:0:0.1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#1E1E20"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0" 
+        <Border x:Name="BoardContainer"
+                Grid.Column="0" 
                 Background="#141414" 
                 Margin="12" 
                 BorderBrush="#2D2D30" 
@@ -33,7 +136,8 @@
                 <ItemsControl x:Name="BoardControl" 
                               ItemsSource="{Binding Board.Cells}"
                               HorizontalAlignment="Center"
-                              VerticalAlignment="Center">
+                              VerticalAlignment="Center"
+                              Margin="800">
 
                     <ItemsControl.LayoutTransform>
                         <ScaleTransform x:Name="BoardScaleTransform" ScaleX="1.0" ScaleY="1.0"/>
@@ -97,250 +201,319 @@
         <Border Grid.Column="1" 
                 Background="#202023" 
                 Margin="0,12,12,12" 
-                Padding="14" 
                 BorderBrush="#2D2D30" 
                 BorderThickness="1" 
                 CornerRadius="4">
-            <StackPanel>
-                <TextBlock Text="Options" 
-                           Foreground="#FFFFFF" 
-                           FontSize="16" 
-                           FontWeight="Bold" 
-                           Margin="0,0,0,14"/>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="R" 
-                               Foreground="#AAAAAA"
-                               FontSize="15" 
-                               FontWeight="Bold" 
-                               Margin="5,10,0,10"/>
-                    <TextBox x:Name="RText"
-                             Text="{Binding CurrentOptions.RText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Width="55"
-                             Height="25"
-                             Margin="16,0,0,0"
-                             TextAlignment="Center"/>
-                    <TextBlock Text="W" 
-                               Foreground="#AAAAAA" 
-                               FontSize="15" 
-                               FontWeight="Bold" 
-                               Margin="40,10,0,10"/>
-                    <TextBox x:Name="WText"
-                             Text="{Binding CurrentOptions.WText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Width="55"
-                             Height="25"
-                             Margin="16,0,0,0"
-                             TextAlignment="Center"/>
-                </StackPanel>
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="B" 
-                               Foreground="#AAAAAA" 
-                               FontSize="15" 
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="14">
+                <StackPanel>
+                    <TextBlock Text="Options" 
+                               Foreground="#FFFFFF" 
+                               FontSize="16" 
                                FontWeight="Bold" 
-                               Margin="5,10,0,10"/>
-                    <TextBox x:Name="BText"
-                             Text="{Binding CurrentOptions.BText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Width="55"
-                             Height="25"
-                             Margin="16,0,0,0"
-                             TextAlignment="Center"/>
-                    <TextBlock Text="P" 
-                               Foreground="#AAAAAA" 
-                               FontSize="15" 
-                               FontWeight="Bold" 
-                               Margin="46,10,0,10"/>
-                    <TextBox x:Name="PText"
-                             Text="{Binding CurrentOptions.PText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Width="55"
-                             Height="25"
-                             Margin="16,0,0,0"
-                             TextAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Z" 
-                               Foreground="#AAAAAA" 
-                               FontSize="15" 
-                               FontWeight="Bold" 
-                               Margin="70,10,0,10"/>
-                    <TextBox x:Name="ZText"
-                             Text="{Binding CurrentOptions.ZText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             Width="55"
-                             Height="25"
-                             Margin="16,0,0,0"
-                             TextAlignment="Center"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="M" 
-                               Foreground="#AAAAAA" 
-                               FontSize="15" 
-                               FontWeight="Bold" 
-                               Margin="5,10,0,10"/>
-                    <Slider x:Name="MSlider"
-                            Minimum="1"
-                            Maximum="5"
-                            Value="{Binding CurrentOptions.M, Mode=TwoWay}"
-                            TickFrequency="1"
-                            IsSnapToTickEnabled="True"
-                            TickPlacement="BottomRight" 
-                            Width="160" 
-                            Height="24"
-                            Margin="16,0,0,0"/>
-                    <TextBlock Text="{Binding ElementName=MSlider, Path=Value}" 
-                               Foreground="#AAAAAA" 
-                               FontSize="15" 
-                               FontWeight="Bold" 
-                               Margin="5,5,0,10"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="L" 
-                               Foreground="#AAAAAA" 
-                               FontSize="15" 
-                               FontWeight="Bold" 
-                               Margin="11,10,0,10"/>
-                    <Slider x:Name="LSlider"
-                            Minimum="1"
-                            Maximum="50"
-                            Value="{Binding CurrentOptions.L, Mode=TwoWay}"
-                            TickFrequency="1"
-                            IsSnapToTickEnabled="True"
-                            TickPlacement="BottomRight" 
-                            Width="160" 
-                            Height="24"
-                            Margin="16,0,0,0"/>
-                    <TextBlock Text="{Binding ElementName=LSlider, Path=Value}" 
-                               Foreground="#AAAAAA" 
-                               FontSize="15" 
-                               FontWeight="Bold" 
-                               Margin="5,5,0,10"/>
-                </StackPanel>
-                <TextBlock Text="Control" 
-                           Foreground="#FFFFFF" 
-                           FontSize="16" 
-                           FontWeight="Bold" 
-                           Margin="0,10,0,14"/>
+                               Margin="0,0,0,14"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="R" 
+                                   Foreground="#AAAAAA"
+                                   FontSize="15" 
+                                   FontWeight="Bold" 
+                                   Margin="5,10,0,10"/>
+                        <TextBox x:Name="RText"
+                                 Text="{Binding CurrentOptions.RText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="55"
+                                 Height="25"
+                                 Margin="16,0,0,0"
+                                 TextAlignment="Center"/>
+                        <TextBlock Text="W" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="15" 
+                                   FontWeight="Bold" 
+                                   Margin="40,10,0,10"/>
+                        <TextBox x:Name="WText"
+                                 Text="{Binding CurrentOptions.WText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="55"
+                                 Height="25"
+                                 Margin="16,0,0,0"
+                                 TextAlignment="Center"/>
+                    </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Height="35">
-                    <Button x:Name="PopulateButton"
-                            Content="Populate"
-                            Click="PopulateButton_Click"
-                            Width="70"
-                            Margin="20,0,0,0"/>
-                    <Button x:Name="ClearButton"
-                            Content="Clear"
-                            Click="ClearButton_Click"
-                            Width="70"
-                            Margin="40,0,0,0"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Height="35" Margin="0,15,0,0">
-                    <Button x:Name="StepButton"
-                            Content="Step"
-                            Click="StepButton_Click"
-                            Width="70"
-                            Margin="20,0,0,0"/>
-                    <StackPanel Orientation="Vertical">
-                        <Slider x:Name="SpeedSlider"
-                                Minimum="0"
-                                Maximum="10"
-                                Value="{Binding SimulationSpeed, Mode=TwoWay}"
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="B" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="15" 
+                                   FontWeight="Bold" 
+                                   Margin="5,10,0,10"/>
+                        <TextBox x:Name="BText"
+                                 Text="{Binding CurrentOptions.BText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="55"
+                                 Height="25"
+                                 Margin="16,0,0,0"
+                                 TextAlignment="Center"/>
+                        <TextBlock Text="P" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="15" 
+                                   FontWeight="Bold" 
+                                   Margin="46,10,0,10"/>
+                        <TextBox x:Name="PText"
+                                 Text="{Binding CurrentOptions.PText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="55"
+                                 Height="25"
+                                 Margin="16,0,0,0"
+                                 TextAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Z" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="15" 
+                                   FontWeight="Bold" 
+                                   Margin="70,10,0,10"/>
+                        <TextBox x:Name="ZText"
+                                 Text="{Binding CurrentOptions.ZText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="55"
+                                 Height="25"
+                                 Margin="16,0,0,0"
+                                 TextAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="M" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="15" 
+                                   FontWeight="Bold" 
+                                   Margin="5,10,0,10"/>
+                        <Slider x:Name="MSlider"
+                                Minimum="1"
+                                Maximum="5"
+                                Value="{Binding CurrentOptions.M, Mode=TwoWay}"
                                 TickFrequency="1"
                                 IsSnapToTickEnabled="True"
                                 TickPlacement="BottomRight" 
-                                Width="110" 
-                                Height="20"
-                                Margin="20,0,0,0"/>
-                        <TextBlock Text="{Binding ElementName=SpeedSlider, Path=Value, StringFormat='speed: {0}'}" 
+                                Width="160" 
+                                Height="24"
+                                Margin="16,0,0,0"/>
+                        <TextBlock Text="{Binding ElementName=MSlider, Path=Value}" 
                                    Foreground="#AAAAAA" 
-                                   FontSize="10" 
+                                   FontSize="15" 
                                    FontWeight="Bold" 
-                                   Margin="50,2,0,0"/>
+                                   Margin="5,5,0,10"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="L" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="15" 
+                                   FontWeight="Bold" 
+                                   Margin="11,10,0,10"/>
+                        <Slider x:Name="LSlider"
+                                Minimum="1"
+                                Maximum="50"
+                                Value="{Binding CurrentOptions.L, Mode=TwoWay}"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                TickPlacement="BottomRight" 
+                                Width="160" 
+                                Height="24"
+                                Margin="16,0,0,0"/>
+                        <TextBlock Text="{Binding ElementName=LSlider, Path=Value}" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="15" 
+                                   FontWeight="Bold" 
+                                   Margin="5,5,0,10"/>
+                    </StackPanel>
+                    <TextBlock Text="Control" 
+                               Foreground="#FFFFFF" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,14"/>
+
+                    <StackPanel Orientation="Horizontal" Height="35">
+                        <Button x:Name="PopulateButton"
+                                Content="Populate"
+                                Style="{StaticResource AnimatedButtonStyle}"
+                                Click="PopulateButton_Click"
+                                Width="70"
+                                Margin="20,0,0,0"/>
+                        <Button x:Name="ClearButton"
+                                Content="Clear"
+                                Style="{StaticResource AnimatedButtonStyle}"
+                                Click="ClearButton_Click"
+                                Width="70"
+                                Margin="40,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Height="35" Margin="0,15,0,0">
+                        <Button x:Name="StepButton"
+                                Content="Step"
+                                Style="{StaticResource AnimatedButtonStyle}"
+                                Click="StepButton_Click"
+                                Width="70"
+                                Margin="20,0,0,0"/>
+                        <StackPanel Orientation="Vertical">
+                            <Slider x:Name="SpeedSlider"
+                                    Minimum="0"
+                                    Maximum="10"
+                                    Value="{Binding SimulationSpeed, Mode=TwoWay}"
+                                    TickFrequency="1"
+                                    IsSnapToTickEnabled="True"
+                                    TickPlacement="BottomRight" 
+                                    Width="110" 
+                                    Height="20"
+                                    Margin="20,0,0,0"/>
+                            <TextBlock Text="{Binding ElementName=SpeedSlider, Path=Value, StringFormat='speed: {0}'}" 
+                                       Foreground="#AAAAAA" 
+                                       FontSize="10" 
+                                       FontWeight="Bold" 
+                                       Margin="50,2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Text="Statistics" 
+                               Foreground="#FFFFFF" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,5"/>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Year: " 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="12" 
+                                   FontWeight="Bold" 
+                                   Margin="0,10,0,5"/>
+                        <TextBlock Text="{Binding CurrentYear}" 
+                                   Foreground="#AAAAAA" 
+                                   FontSize="12" 
+                                   FontWeight="Bold" 
+                                   Margin="0,10,0,5"/>
+                    </StackPanel>
+
+                    <Grid Width="230" Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24" />
+                            <RowDefinition Height="24" />
+                            <RowDefinition Height="24" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="plants:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Stats.TotalPlants}" Foreground="#4CAF50" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="animals:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Stats.TotalAnimals}" Foreground="#EF5350" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="grown:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Stats.PlantsGrown}" Foreground="#81C784" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="born:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding Stats.AnimalsBorn}" Foreground="#E57373" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="wilted:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Stats.PlantsWilted}" Foreground="#DCE775" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="died:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding Stats.AnimalsDied}" Foreground="#B0BEC5" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                    <TextBlock Text="Save/Load" 
+                               Foreground="#FFFFFF" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,5"/>
+
+                    <StackPanel Orientation="Horizontal" 
+                                Height="35" 
+                                Margin="0,10,0,0">
+                        <Button x:Name="SaveButton"
+                                Content="Save"
+                                Style="{StaticResource AnimatedButtonStyle}"
+                                Click="SaveButton_Click"
+                                Width="70"
+                                Margin="20,0,0,0"/>
+                        <Button x:Name="LoadButton"
+                                Content="Load"
+                                Style="{StaticResource AnimatedButtonStyle}"
+                                Click="LoadButton_Click"
+                                Width="70"
+                                Margin="40,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                        <TextBlock Text="Plant color:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#FFFFFF"/>
+                        <xctk:ColorPicker SelectedColor="{Binding PlantColor, Mode=TwoWay}"
+                                          Width="120"
+                                          ShowDropDownButton="True"
+                                          UsingAlphaChannel="False"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                        <TextBlock Text="Animal color:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#FFFFFF"/>
+                        <xctk:ColorPicker SelectedColor="{Binding AnimalColor, Mode=TwoWay}"
+                                          Width="120"
+                                          ShowDropDownButton="True"
+                                          UsingAlphaChannel="False"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Record Clip (.gif)" 
+                                   Foreground="#FFFFFF" 
+                                   FontSize="16" 
+                                   FontWeight="Bold" 
+                                   Margin="0,10,0,5"/>
+                        <Ellipse x:Name="RecordingMarker"
+                                 Margin="5,10,0,0"
+                                 Width="10" 
+                                 Height="10" 
+                                 Fill="Red"
+                                 HorizontalAlignment="Center" 
+                                 VerticalAlignment="Center">
+                            <Ellipse.Style>
+                                <Style TargetType="Ellipse">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsRecording}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Ellipse.Style>
+                        </Ellipse>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Height="35" 
+                                Margin="0,15,10,0">
+                        <Button x:Name="RecordClipButton"
+                                Content="Record"
+                                Style="{StaticResource AnimatedButtonStyle}"
+                                Click="RecordClipButton_Click"
+                                Width="70"
+                                Margin="20,0,0,0"/>
+                        <TextBlock Text="Frames:" 
+                                   Margin="10,7,0,0"
+                                   Foreground="#FFFFFF" 
+                                   FontSize="12"/>
+                        <TextBlock Text="{Binding RecordingFrame}"
+                                   Margin="5,7,0,0"
+                                   Foreground="#FFFFFF" 
+                                   FontSize="12"/>
+                        <TextBlock Text=" / 50" 
+                                   Margin="0,7,0,0"
+                                   Foreground="#FFFFFF" 
+                                   FontSize="12"/>
+                    </StackPanel>
+                    <TextBlock Text="Zoom on born" 
+                               Foreground="#FFFFFF" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Margin="0,10,0,5"/>
+                    <StackPanel Orientation="Horizontal"
+                                Height="35" 
+                                Margin="0,15,10,0">
+                        <Button x:Name="ZoomOnAnimalsButton"
+                                Content="{Binding AutoZoomText}"
+                                Style="{StaticResource AnimatedButtonStyle}"
+                                Click="ZoomOnAnimalsButton_Click"
+                                Width="120"
+                                Margin="20,0,0,0"/>
                     </StackPanel>
                 </StackPanel>
-                <TextBlock Text="Statistics" 
-                           Foreground="#FFFFFF" 
-                           FontSize="16" 
-                           FontWeight="Bold" 
-                           Margin="0,10,0,5"/>
-
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Year: " 
-                               Foreground="#AAAAAA" 
-                               FontSize="12" 
-                               FontWeight="Bold" 
-                               Margin="0,10,0,5"/>
-                    <TextBlock Text="{Binding CurrentYear}" 
-                               Foreground="#AAAAAA" 
-                               FontSize="12" 
-                               FontWeight="Bold" 
-                               Margin="0,10,0,5"/>
-                </StackPanel>
-
-                <Grid Width="230" Margin="0,4,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="24" />
-                        <RowDefinition Height="24" />
-                        <RowDefinition Height="24" />
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="plants:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Stats.TotalPlants}" Foreground="#4CAF50" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
-
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="animals:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Stats.TotalAnimals}" Foreground="#EF5350" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
-
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="grown:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Stats.PlantsGrown}" Foreground="#81C784" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
-
-                    <TextBlock Grid.Row="1" Grid.Column="2" Text="born:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding Stats.AnimalsBorn}" Foreground="#E57373" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
-
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="wilted:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Stats.PlantsWilted}" Foreground="#DCE775" FontSize="11" FontWeight="Bold" Margin="4,0,8,0" VerticalAlignment="Center"/>
-
-                    <TextBlock Grid.Row="2" Grid.Column="2" Text="died:" Foreground="#AAAAAA" FontSize="11" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding Stats.AnimalsDied}" Foreground="#B0BEC5" FontSize="11" FontWeight="Bold" Margin="4,0,0,0" VerticalAlignment="Center"/>
-                </Grid>
-                <TextBlock Text="Save/Load" 
-                           Foreground="#FFFFFF" 
-                           FontSize="16" 
-                           FontWeight="Bold" 
-                           Margin="0,10,0,5"/>
-
-                <StackPanel Orientation="Horizontal" 
-                            Height="35" 
-                            Margin="0,10,0,0">
-                    <Button x:Name="SaveButton"
-                            Content="Save"
-                            Click="SaveButton_Click"
-                            Width="70"
-                            Margin="20,0,0,0"/>
-                    <Button x:Name="LoadButton"
-                            Content="Load"
-                            Click="LoadButton_Click"
-                            Width="70"
-                            Margin="40,0,0,0"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
-                    <TextBlock Text="Plant color:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#FFFFFF"/>
-                    <xctk:ColorPicker SelectedColor="{Binding PlantColor, Mode=TwoWay}"
-                                      Width="120"
-                                      ShowDropDownButton="True"
-                                      UsingAlphaChannel="False"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
-                    <TextBlock Text="Animal color:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="#FFFFFF"/>
-                    <xctk:ColorPicker SelectedColor="{Binding AnimalColor, Mode=TwoWay}"
-                                      Width="120"
-                                      ShowDropDownButton="True"
-                                      UsingAlphaChannel="False"/>
-                </StackPanel>
-            </StackPanel>
+            </ScrollViewer>
         </Border>
     </Grid>
 </Window>

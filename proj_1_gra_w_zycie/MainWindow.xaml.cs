@@ -35,6 +35,53 @@ namespace proj_1_gra_w_zycie
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        private bool _isRecording = false;
+        public bool IsRecording
+        {
+            get => _isRecording;
+            set
+            {
+                if (_isRecording != value)
+                {
+                    _isRecording = value;
+                    NotifyPropertyChanged(nameof(IsRecording));
+                }
+            }
+        }
+        private int _recordingFrame = 0;
+
+        public int RecordingFrame
+        {
+            get => _recordingFrame;
+            set
+            {
+                if (_recordingFrame != value)
+                {
+                    _recordingFrame = value;
+                    NotifyPropertyChanged(nameof(RecordingFrame));
+                }
+            }
+        }
+
+        private bool _autoZoom = false;
+        public bool AutoZoom
+        {
+            get => _autoZoom;
+            set
+            {
+                if (_autoZoom != value)
+                {
+                    _autoZoom = value;
+                    NotifyPropertyChanged();
+                    NotifyPropertyChanged(nameof(AutoZoomText));
+                }
+            }
+        }
+
+        public string AutoZoomText => AutoZoom ? "Auto Zoom: ON" : "Auto Zoom: OFF";
+
+        private List<RenderTargetBitmap> gifFrames = new List<RenderTargetBitmap>();
+
         protected void NotifyPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -137,6 +184,15 @@ namespace proj_1_gra_w_zycie
             CurrentOptions = new Options();
             Stats = new Statistics();
             CurrentYear = 0;
+
+            SetZoom(1.0);
+            BoardScrollViewer.UpdateLayout();
+
+            double centerOffsetX = (BoardScrollViewer.ExtentWidth - BoardScrollViewer.ViewportWidth) / 2;
+            double centerOffsetY = (BoardScrollViewer.ExtentHeight - BoardScrollViewer.ViewportHeight) / 2;
+
+            BoardScrollViewer.ScrollToHorizontalOffset(centerOffsetX);
+            BoardScrollViewer.ScrollToVerticalOffset(centerOffsetY);
         }
 
         private void UpdateTimerInterval()
@@ -167,6 +223,24 @@ namespace proj_1_gra_w_zycie
         private void ExecuteSimulationStep()
         {
             Board?.Tick(CurrentOptions, Stats);
+
+            if (IsRecording == true)
+            {
+                gifFrames.Add(BoardScreenshot(BoardContainer));
+                RecordingFrame++;
+
+                if(RecordingFrame > 50)
+                {
+                    IsRecording = false;
+                    RecordingFrame = 0;
+
+                    CreateGif();
+                }
+            }
+            if (AutoZoom)
+            {
+                zoomOnBorn();
+            }
             CurrentYear++;
             UpdateStatisticsCounts();
         }
@@ -388,6 +462,112 @@ namespace proj_1_gra_w_zycie
                 {
                     SetZoom(newScale);
                 }
+            }
+        }
+
+        private RenderTargetBitmap BoardScreenshot(UIElement el)
+        {
+            int width = (int)el.RenderSize.Width;
+            int height = (int)el.RenderSize.Height;
+
+            RenderTargetBitmap rtb = new RenderTargetBitmap(
+                width, height, 96, 96, PixelFormats.Pbgra32);
+
+            rtb.Render(el);
+            return rtb;
+        }
+
+        private void RecordClipButton_Click(object sender, RoutedEventArgs e)
+        {
+            IsRecording = true;
+        }
+
+        private void CreateGif()
+        {
+            try
+            {
+                string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string filePath = System.IO.Path.Combine(docPath, "GameOfLife_Clip.gif");
+
+                GifBitmapEncoder encoder = new GifBitmapEncoder();
+
+                foreach (var frame in gifFrames)
+                {
+                    encoder.Frames.Add(BitmapFrame.Create(frame));
+                }
+
+                using (FileStream fs = new FileStream(filePath, FileMode.Create))
+                {
+                    encoder.Save(fs);
+                }
+
+                MessageBox.Show($"Saved gif to:\n{filePath}", "Recording stopped", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error saving GIF:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                gifFrames.Clear();
+            }
+        }
+
+        private void ZoomOnAnimalsButton_Click(object sender, RoutedEventArgs e)
+        {
+            AutoZoom = !AutoZoom;
+
+            if (AutoZoom)
+            {
+                zoomOnBorn();
+            }
+            if (!AutoZoom)
+            {
+                SetZoom(1.0);
+                BoardScrollViewer.UpdateLayout();
+
+                double centerOffsetX = (BoardScrollViewer.ExtentWidth - BoardScrollViewer.ViewportWidth) / 2;
+                double centerOffsetY = (BoardScrollViewer.ExtentHeight - BoardScrollViewer.ViewportHeight) / 2;
+
+                BoardScrollViewer.ScrollToHorizontalOffset(centerOffsetX);
+                BoardScrollViewer.ScrollToVerticalOffset(centerOffsetY);
+            }
+        }
+
+        private void zoomOnBorn()
+        {
+            var newbornField = Board.Fields.Cast<Field>().FirstOrDefault(f => f.HasAnimal && f.AnimalAge == 0);
+
+            if (newbornField != null)
+            {
+                SetZoom(3.0);
+
+                BoardScrollViewer.UpdateLayout();
+
+                var container = BoardControl.ItemContainerGenerator.ContainerFromItem(newbornField) as FrameworkElement;
+
+                if (container != null)
+                {
+                    GeneralTransform transform = container.TransformToAncestor(BoardScrollViewer);
+                    Point centerInViewport = transform.Transform(new Point(container.ActualWidth / 2, container.ActualHeight / 2));
+
+                    double deltaX = centerInViewport.X - (BoardScrollViewer.ViewportWidth / 2);
+                    double deltaY = centerInViewport.Y - (BoardScrollViewer.ViewportHeight / 2);
+
+                    BoardScrollViewer.ScrollToHorizontalOffset(BoardScrollViewer.HorizontalOffset + deltaX);
+                    BoardScrollViewer.ScrollToVerticalOffset(BoardScrollViewer.VerticalOffset + deltaY);
+                }
+            }
+            else
+            {
+                SetZoom(1.0);
+                BoardScrollViewer.UpdateLayout();
+
+                double centerOffsetX = (BoardScrollViewer.ExtentWidth - BoardScrollViewer.ViewportWidth) / 2;
+                double centerOffsetY = (BoardScrollViewer.ExtentHeight - BoardScrollViewer.ViewportHeight) / 2;
+
+                BoardScrollViewer.ScrollToHorizontalOffset(centerOffsetX);
+                BoardScrollViewer.ScrollToVerticalOffset(centerOffsetY);
             }
         }
     }
